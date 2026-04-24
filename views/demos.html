@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — demo or die</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .demos-intro {
+      padding: 2.5rem 0 0.5rem;
+    }
+
+    .demos-intro__eyebrow {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+
+    .demos-intro__title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .demos-intro__subtitle {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      max-width: 560px;
+    }
+
+    /* ── Form ── */
+    .demos-form-wrap {
+      max-width: 640px;
+      margin-bottom: 2.5rem;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      .form-row-2 { grid-template-columns: 1fr; }
+    }
+
+    .form-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-label__optional {
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 0.8125rem;
+      margin-left: 0.35rem;
+    }
+
+    .form-textarea {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--bg);
+      resize: vertical;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color 0.15s ease;
+      min-height: 120px;
+    }
+
+    .form-textarea:focus { border-color: var(--coral); }
+
+    .form-actions {
+      margin-top: 1.5rem;
+    }
+
+    /* ── Confirmation banner ── */
+    .confirm-banner {
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(58, 168, 118, 0.1);
+      border: 1px solid rgba(58, 168, 118, 0.3);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      font-size: 0.9375rem;
+      color: #70c898;
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+    }
+
+    .confirm-banner.visible { display: flex; }
+
+    /* ── Error ── */
+    .demos-error {
+      display: none;
+      font-size: 0.875rem;
+      color: #e05454;
+      margin-top: 0.65rem;
+    }
+
+    .demos-error.visible { display: block; }
+
+    /* ── Filters ── */
+    .demos-filters {
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 0.3rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--coral);
+      color: var(--coral);
+    }
+
+    .filter-pill.active {
+      background: var(--coral);
+      border-color: var(--coral);
+      color: #fff;
+    }
+
+    .filter-pill--lovelace.active { background: #E8735A; border-color: #E8735A; }
+    .filter-pill--turing.active   { background: #2A9D8F; border-color: #2A9D8F; }
+    .filter-pill--hopper.active   { background: #E9B44C; border-color: #E9B44C; }
+
+    .filter-divider {
+      width: 1px;
+      height: 1.5rem;
+      background: var(--border);
+    }
+
+    .filter-select {
+      padding: 0.3rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 0.8125rem;
+      color: var(--ink);
+      background: var(--bg);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-select:focus { border-color: var(--coral); }
+
+    /* ── Gallery ── */
+    .demos-gallery {
+      max-width: 800px;
+      padding-bottom: 4rem;
+    }
+
+    .demos-meta {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Demo card ── */
+    .demo-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .demo-card__header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .demo-card__name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .demo-card__house-badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .house-badge--lovelace { background: rgba(201, 72, 88, 0.15);  color: #e8808a; }
+    .house-badge--turing   { background: rgba(75, 125, 191, 0.15); color: #80aae0; }
+    .house-badge--hopper   { background: rgba(58, 168, 118, 0.15); color: #70c898; }
+
+    .demo-card__type-pill {
+      display: inline-block;
+      padding: 0.15rem 0.65rem;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .demo-card__ts {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .demo-card__description {
+      font-size: 0.9375rem;
+      color: var(--ink);
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+      white-space: pre-wrap;
+    }
+
+    .demo-card__description:last-child { margin-bottom: 0; }
+
+    .demo-card__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.875rem;
+      color: var(--teal);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .demo-card__link:hover { text-decoration: underline; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-state__emoji {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-state__text {
+      font-size: 1rem;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/dashboard" class="site-header__logo">claude's <span>army</span></a>
+        <nav class="site-header__nav">
+          <div class="nav-links">
+            <a href="/checkin">check-in</a>
+            <a href="/feynman">feynman</a>
+            <a href="/digest">digest</a>
+            <a href="/houses">houses</a>
+            <a href="/meetings">meetings</a>
+            <a href="/demos">demos</a>
+            <a href="/map">map</a>
+          </div>
+          <form method="POST" action="/logout" style="margin:0">
+            <button type="submit" class="btn btn--ghost" style="padding:0.4rem 1rem;font-size:0.8125rem;">log out</button>
+          </form>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="demos-intro">
+        <p class="demos-intro__eyebrow">demo or die</p>
+        <h1 class="demos-intro__title">show your rough work</h1>
+        <p class="demos-intro__subtitle">the name is dramatic on purpose. the bar is intentionally low. post what you built, tried, or broke — before it's ready.</p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Submit form -->
+      <div class="demos-form-wrap">
+        <div class="confirm-banner" id="confirm-banner">
+          shipped. rough work is real work. 🚀
+        </div>
+
+        <form id="demo-form" novalidate>
+          <div class="form-row-2">
+            <div class="form-section">
+              <label class="form-label" for="demo-name">your name</label>
+              <input class="form-input" type="text" id="demo-name" placeholder="your name" autocomplete="off">
+            </div>
+            <div class="form-section">
+              <label class="form-label" for="demo-house">
+                house <span class="form-label__optional">optional</span>
+              </label>
+              <select class="form-input" id="demo-house">
+                <option value="">— pick your house —</option>
+                <option value="lovelace">House Lovelace</option>
+                <option value="turing">House Turing</option>
+                <option value="hopper">House Hopper</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="demo-type">
+              what is this? <span class="form-label__optional">optional</span>
+            </label>
+            <select class="form-input" id="demo-type">
+              <option value="">— pick a type —</option>
+              <option value="prototype">prototype</option>
+              <option value="experiment">experiment</option>
+              <option value="failed attempt">failed attempt</option>
+              <option value="work in progress">work in progress</option>
+              <option value="concept demo">concept demo</option>
+              <option value="tool exploration">tool exploration</option>
+              <option value="mini project">mini project</option>
+            </select>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="demo-description">what did you do?</label>
+            <textarea
+              class="form-textarea"
+              id="demo-description"
+              placeholder="low bar, high frequency. tell us what you did, what happened, and what you learned."
+            ></textarea>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="demo-link">
+              link <span class="form-label__optional">optional</span>
+            </label>
+            <input class="form-input" type="url" id="demo-link" placeholder="https://...">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary" id="demo-submit">post your demo</button>
+          </div>
+
+          <p class="demos-error" id="demos-error"></p>
+        </form>
+      </div>
+
+      <!-- Filters + gallery -->
+      <div class="demos-filters">
+        <div class="filter-pills" id="house-pills">
+          <button class="filter-pill active" data-house="">all houses</button>
+          <button class="filter-pill filter-pill--lovelace" data-house="lovelace">lovelace</button>
+          <button class="filter-pill filter-pill--turing" data-house="turing">turing</button>
+          <button class="filter-pill filter-pill--hopper" data-house="hopper">hopper</button>
+        </div>
+        <div class="filter-divider"></div>
+        <select class="filter-select" id="type-filter">
+          <option value="">all types</option>
+          <option value="prototype">prototype</option>
+          <option value="experiment">experiment</option>
+          <option value="failed attempt">failed attempt</option>
+          <option value="work in progress">work in progress</option>
+          <option value="concept demo">concept demo</option>
+          <option value="tool exploration">tool exploration</option>
+          <option value="mini project">mini project</option>
+        </select>
+      </div>
+
+      <div class="demos-gallery">
+        <p class="demos-meta" id="demos-meta"></p>
+        <div id="demos-list">
+          <p style="color:var(--muted);font-size:0.9375rem;">loading...</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ── Relative time ──
+    function relativeTime(iso) {
+      const diff = Date.now() - new Date(iso).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1)   return 'just now';
+      if (mins < 60)  return `${mins}m ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24)   return `${hrs}h ago`;
+      const days = Math.floor(hrs / 24);
+      if (days === 1) return 'yesterday';
+      if (days < 7)   return `${days}d ago`;
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    // ── Escape HTML ──
+    function esc(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ── House badge ──
+    function houseBadge(house) {
+      const labels = { lovelace: 'Lovelace', turing: 'Turing', hopper: 'Hopper' };
+      if (!house || !labels[house]) return '';
+      return `<span class="demo-card__house-badge house-badge--${house}">${labels[house]}</span>`;
+    }
+
+    // ── Render single card ──
+    function renderCard(d) {
+      const typePill = d.demoType
+        ? `<span class="demo-card__type-pill">${esc(d.demoType)}</span>`
+        : '';
+      const linkEl = d.link
+        ? `<a class="demo-card__link" href="${esc(d.link)}" target="_blank" rel="noopener noreferrer">view it &rarr;</a>`
+        : '';
+      return `
+        <div class="demo-card">
+          <div class="demo-card__header">
+            <span class="demo-card__name">${esc(d.name)}</span>
+            ${houseBadge(d.house)}
+            ${typePill}
+            <span class="demo-card__ts">${relativeTime(d.timestamp)}</span>
+          </div>
+          <p class="demo-card__description">${esc(d.description)}</p>
+          ${linkEl}
+        </div>`;
+    }
+
+    // ── Render gallery ──
+    function renderGallery(arr) {
+      const meta = document.getElementById('demos-meta');
+      const list = document.getElementById('demos-list');
+      if (arr.length === 0) {
+        meta.textContent = '';
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__emoji">&#x1F4BB;</div>
+            <p class="empty-state__text">no demos yet. someone has to go first — why not you?</p>
+          </div>`;
+      } else {
+        meta.textContent = `${arr.length} demo${arr.length === 1 ? '' : 's'}`;
+        list.innerHTML = arr.map(renderCard).join('');
+      }
+    }
+
+    // ── Filter state ──
+    let activeHouse = '';
+    let activeType  = '';
+
+    // ── Load demos ──
+    async function loadDemos() {
+      try {
+        const params = new URLSearchParams();
+        if (activeHouse) params.set('house', activeHouse);
+        if (activeType)  params.set('type',  activeType);
+        const res = await fetch(`/api/demos?${params}`);
+        if (!res.ok) throw new Error();
+        const { demos } = await res.json();
+        renderGallery(demos);
+      } catch {
+        document.getElementById('demos-list').innerHTML =
+          '<p style="color:#e05454;font-size:0.9375rem;">could not load demos — please refresh.</p>';
+      }
+    }
+
+    // ── House pill filter ──
+    document.getElementById('house-pills').addEventListener('click', (e) => {
+      const pill = e.target.closest('.filter-pill');
+      if (!pill) return;
+      document.querySelectorAll('#house-pills .filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeHouse = pill.dataset.house;
+      loadDemos();
+    });
+
+    // ── Type filter ──
+    document.getElementById('type-filter').addEventListener('change', (e) => {
+      activeType = e.target.value;
+      loadDemos();
+    });
+
+    // ── Form submit ──
+    const form        = document.getElementById('demo-form');
+    const submitBtn   = document.getElementById('demo-submit');
+    const errorEl     = document.getElementById('demos-error');
+    const confirmBanner = document.getElementById('confirm-banner');
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.add('visible');
+    }
+
+    function clearError() {
+      errorEl.textContent = '';
+      errorEl.classList.remove('visible');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+      confirmBanner.classList.remove('visible');
+
+      const name        = document.getElementById('demo-name').value.trim();
+      const description = document.getElementById('demo-description').value.trim();
+
+      if (!name) {
+        showError('please enter your name.');
+        document.getElementById('demo-name').focus();
+        return;
+      }
+      if (!description) {
+        showError('please describe what you did.');
+        document.getElementById('demo-description').focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/demos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            house:       document.getElementById('demo-house').value,
+            demoType:    document.getElementById('demo-type').value,
+            description,
+            link:        document.getElementById('demo-link').value.trim()
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || 'something went wrong — please try again.');
+          return;
+        }
+
+        form.reset();
+        confirmBanner.classList.add('visible');
+        confirmBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        await loadDemos();
+      } catch {
+        showError('something went wrong — try again in a moment.');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Load on init
+    loadDemos();
+  </script>
+  <script src="/js/nav.js"></script>
+
+</body>
+</html>

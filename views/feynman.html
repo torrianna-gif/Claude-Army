@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — feynman corner</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .feynman-intro {
+      padding: 2.5rem 0 0.5rem;
+    }
+
+    .feynman-intro__eyebrow {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+
+    .feynman-intro__title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feynman-intro__subtitle {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      max-width: 560px;
+    }
+
+    /* ── Form ── */
+    .feynman-form {
+      max-width: 640px;
+      padding-bottom: 2rem;
+    }
+
+    .form-section {
+      margin-bottom: 1.75rem;
+    }
+
+    .form-label {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-label__optional {
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 0.8125rem;
+      margin-left: 0.35rem;
+    }
+
+    .form-textarea {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--bg);
+      resize: vertical;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-textarea:focus { border-color: var(--coral); }
+
+    .explanation-textarea { min-height: 180px; }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* ── Loading ── */
+    .loading-row {
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--muted);
+      font-size: 0.9375rem;
+    }
+
+    .loading-row.visible { display: flex; }
+
+    .loading-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── Feedback card ── */
+    .feedback-area {
+      max-width: 640px;
+      padding-bottom: 4rem;
+    }
+
+    .feedback-card {
+      display: none;
+      background: var(--surface);
+      border-left: 3px solid var(--teal);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .feedback-card.visible { display: block; }
+
+    .feedback-card h3 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feedback-card h3:first-child { margin-top: 0; }
+
+    .feedback-card p {
+      font-size: 0.9375rem;
+      color: var(--ink);
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+
+    .feedback-card p:last-child { margin-bottom: 0; }
+
+    .feedback-card strong { font-weight: 600; }
+    .feedback-card em { font-style: italic; }
+
+    /* ── Error ── */
+    .feynman-error {
+      display: none;
+      font-size: 0.875rem;
+      color: #e05454;
+      margin-top: 0.75rem;
+    }
+
+    .feynman-error.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/dashboard" class="site-header__logo">claude's <span>army</span></a>
+        <nav class="site-header__nav">
+          <div class="nav-links">
+            <a href="/checkin">check-in</a>
+            <a href="/feynman">feynman</a>
+            <a href="/digest">digest</a>
+            <a href="/houses">houses</a>
+            <a href="/meetings">meetings</a>
+            <a href="/demos">demos</a>
+            <a href="/map">map</a>
+          </div>
+          <form method="POST" action="/logout" style="margin:0">
+            <button type="submit" class="btn btn--ghost" style="padding:0.4rem 1rem;font-size:0.8125rem;">log out</button>
+          </form>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="feynman-intro">
+        <p class="feynman-intro__eyebrow">feynman corner</p>
+        <h1 class="feynman-intro__title">explain it to understand it</h1>
+        <p class="feynman-intro__subtitle">explain what you just learned as if you're talking to a colleague who's never heard of it. the AI will help you find the gaps.</p>
+      </div>
+
+      <hr class="divider">
+
+      <form class="feynman-form" id="feynman-form" novalidate>
+
+        <div class="form-section">
+          <label class="form-label" for="topic">
+            what concept are you explaining?
+            <span class="form-label__optional">optional</span>
+          </label>
+          <input
+            class="form-input"
+            type="text"
+            id="topic"
+            name="topic"
+            placeholder="e.g. machine learning, embeddings, prompt chaining..."
+          >
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="explanation">your explanation</label>
+          <textarea
+            class="form-textarea explanation-textarea"
+            id="explanation"
+            name="explanation"
+            placeholder="type your explanation here..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary" id="submit-btn">get feedback</button>
+          <div class="loading-row" id="loading-row" aria-live="polite">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <span>thinking...</span>
+          </div>
+        </div>
+
+        <p class="feynman-error" id="feynman-error"></p>
+
+      </form>
+
+      <div class="feedback-area">
+        <div class="feedback-card" id="feedback-card" aria-live="polite"></div>
+        <button class="btn btn--ghost" id="try-another-btn" style="display:none;">try another</button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('feynman-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const loadingRow = document.getElementById('loading-row');
+    const feedbackCard = document.getElementById('feedback-card');
+    const tryAnotherBtn = document.getElementById('try-another-btn');
+    const errorEl = document.getElementById('feynman-error');
+
+    // ── Markdown renderer ──
+    function renderMarkdown(raw) {
+      // Escape HTML
+      const escaped = raw
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Split into blocks on double newlines
+      const blocks = escaped.split(/\n\n+/);
+
+      return blocks.map(block => {
+        const trimmed = block.trim();
+        if (!trimmed) return '';
+
+        // Full-line bold → section heading
+        const headerMatch = trimmed.match(/^\*\*(.*?)\*\*$/);
+        if (headerMatch) {
+          return `<h3>${headerMatch[1]}</h3>`;
+        }
+
+        // Inline bold and italic
+        const html = trimmed
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*((?!\s).*?(?<!\s))\*/g, '<em>$1</em>')
+          .replace(/\n/g, '<br>');
+
+        return `<p>${html}</p>`;
+      }).filter(Boolean).join('\n');
+    }
+
+    // ── Set loading state ──
+    function setLoading(on) {
+      submitBtn.disabled = on;
+      loadingRow.classList.toggle('visible', on);
+    }
+
+    // ── Show error ──
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.add('visible');
+    }
+
+    function clearError() {
+      errorEl.textContent = '';
+      errorEl.classList.remove('visible');
+    }
+
+    // ── Form submit ──
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const explanation = form.explanation.value.trim();
+      if (!explanation) {
+        showError('please write your explanation before asking for feedback.');
+        form.explanation.focus();
+        return;
+      }
+
+      setLoading(true);
+      feedbackCard.classList.remove('visible');
+      tryAnotherBtn.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/feynman', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: form.topic.value.trim(),
+            explanation
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || 'something went wrong — please try again.');
+          return;
+        }
+
+        feedbackCard.innerHTML = renderMarkdown(data.feedback);
+        feedbackCard.classList.add('visible');
+        tryAnotherBtn.style.display = 'inline-flex';
+        feedbackCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch {
+        showError('something went wrong — try again in a moment.');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // ── Try another ──
+    tryAnotherBtn.addEventListener('click', () => {
+      form.reset();
+      feedbackCard.classList.remove('visible');
+      feedbackCard.innerHTML = '';
+      tryAnotherBtn.style.display = 'none';
+      clearError();
+      form.topic.focus();
+    });
+  </script>
+  <script src="/js/nav.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — meetings</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .meetings-intro {
+      padding: 2.5rem 0 0.5rem;
+    }
+
+    .meetings-intro__eyebrow {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+
+    .meetings-intro__title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .meetings-intro__subtitle {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      max-width: 560px;
+    }
+
+    .section-h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Rotation public display ── */
+    .rotation-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 760px;
+      margin-bottom: 2.5rem;
+    }
+
+    .rotation-col__title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.85rem;
+    }
+
+    .rotation-entry {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: var(--radius);
+      font-size: 0.9375rem;
+    }
+
+    .rotation-entry--completed { opacity: 0.45; }
+
+    .rotation-entry--next {
+      background: var(--surface);
+      border-left: 3px solid var(--coral);
+    }
+
+    .rotation-entry__pos {
+      font-size: 0.75rem;
+      color: var(--muted);
+      width: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .rotation-entry__check {
+      font-size: 0.8rem;
+      color: var(--teal);
+      width: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .rotation-entry__name {
+      flex: 1;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .rotation-entry--next .rotation-entry__name { font-weight: 600; }
+
+    .rotation-entry__date {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .next-badge {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      background: var(--coral);
+      color: #fff;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .rotation-empty {
+      font-size: 0.875rem;
+      color: var(--muted);
+      font-style: italic;
+      padding: 0.25rem 0;
+    }
+
+    /* ── Facilitator panel ── */
+    .fac-panel {
+      max-width: 760px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .fac-panel__label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--coral);
+      margin-bottom: 0.85rem;
+    }
+
+    .fac-unlock-row {
+      display: flex;
+      gap: 0.65rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .fac-unlock-row .form-input {
+      max-width: 220px;
+      flex: 1;
+    }
+
+    .fac-error {
+      font-size: 0.875rem;
+      color: #e05454;
+      margin-top: 0.6rem;
+      display: none;
+    }
+
+    /* Facilitator management (unlocked state) */
+    .fac-mgmt { margin-top: 1.25rem; }
+
+    .fac-add-form {
+      display: flex;
+      gap: 0.65rem;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+
+    .fac-add-form .form-input { flex: 1; min-width: 120px; max-width: 180px; }
+    .fac-add-form .form-select { flex: 1; min-width: 150px; max-width: 210px; }
+
+    .rotation-mgmt-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .rotation-mgmt-col__title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--teal);
+      margin-bottom: 0.75rem;
+    }
+
+    .mgmt-entry {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0;
+      font-size: 0.875rem;
+    }
+
+    .mgmt-entry__pos {
+      font-size: 0.75rem;
+      color: var(--muted);
+      width: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .mgmt-entry__name {
+      flex: 1;
+      color: var(--ink);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mgmt-entry--done .mgmt-entry__name {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .mgmt-done-label {
+      font-size: 0.7rem;
+      color: var(--teal);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .mgmt-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.35rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      line-height: 1.4;
+      flex-shrink: 0;
+    }
+
+    .mgmt-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .mgmt-btn[disabled] { opacity: 0.25; cursor: default; pointer-events: none; }
+    .mgmt-btn--done:hover { border-color: var(--teal); color: var(--teal); }
+    .mgmt-btn--remove:hover { border-color: #e05454; color: #e05454; }
+
+    .mgmt-empty {
+      font-size: 0.875rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── Agenda section ── */
+    .agenda-section {
+      max-width: 680px;
+      padding-bottom: 4rem;
+    }
+
+    .agenda-section__subtitle {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .agenda-type-row {
+      margin-bottom: 1.5rem;
+    }
+
+    .agenda-type-row .form-select {
+      max-width: 320px;
+    }
+
+    .agenda-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .agenda-card__header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .agenda-card__title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .agenda-card__duration {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .agenda-item {
+      display: grid;
+      grid-template-columns: 6.75rem 1fr;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .agenda-item:last-child { border-bottom: none; }
+
+    .agenda-item__time {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--coral);
+      padding-top: 0.1rem;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    .agenda-item__title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .agenda-item__body {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .agenda-item__body strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .rotation-columns,
+      .rotation-mgmt-cols { grid-template-columns: 1fr; }
+
+      .agenda-item {
+        grid-template-columns: 1fr;
+        gap: 0.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/dashboard" class="site-header__logo">claude's <span>army</span></a>
+        <nav class="site-header__nav">
+          <div class="nav-links">
+            <a href="/checkin">check-in</a>
+            <a href="/feynman">feynman</a>
+            <a href="/digest">digest</a>
+            <a href="/houses">houses</a>
+            <a href="/meetings">meetings</a>
+            <a href="/demos">demos</a>
+            <a href="/map">map</a>
+          </div>
+          <form method="POST" action="/logout" style="margin:0">
+            <button type="submit" class="btn btn--ghost" style="padding:0.4rem 1rem;font-size:0.8125rem;">log out</button>
+          </form>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="meetings-intro">
+        <p class="meetings-intro__eyebrow">meetings</p>
+        <h1 class="meetings-intro__title">run the meeting</h1>
+        <p class="meetings-intro__subtitle">agendas for every format. rotation tracker so everyone gets a turn — and no one gets stuck leading twice in a row.</p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- ── Rotation tracker ── -->
+      <section>
+        <h2 class="section-h2">who's up next</h2>
+
+        <div class="rotation-columns" id="rotation-columns">
+          <p style="color:var(--muted);font-size:0.9375rem;">loading...</p>
+        </div>
+
+        <!-- Facilitator panel -->
+        <div class="fac-panel">
+          <p class="fac-panel__label">&#x1F512; facilitator tools</p>
+          <div class="fac-unlock-row">
+            <input
+              class="form-input"
+              type="password"
+              id="fac-password"
+              placeholder="facilitator password"
+              autocomplete="current-password"
+            >
+            <button class="btn btn--ghost" id="unlock-btn" style="padding:0.55rem 1rem;font-size:0.875rem;">unlock</button>
+          </div>
+          <p class="fac-error" id="fac-error"></p>
+          <div id="fac-mgmt" style="display:none;"></div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ── Agenda generator ── -->
+      <section class="agenda-section">
+        <h2 class="section-h2">meeting agenda</h2>
+        <p class="agenda-section__subtitle">select a format to see the full run sheet.</p>
+
+        <div class="agenda-type-row">
+          <select class="form-select" id="agenda-type">
+            <option value="" disabled selected>select a meeting type...</option>
+            <option value="group-watch">group watch (early stage 1)</option>
+            <option value="discussion-shareout">discussion + shareout</option>
+          </select>
+        </div>
+
+        <div id="agenda-container"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // ── State ──
+    let rotationData = [];
+    let facilitatorPw  = null;
+    let isUnlocked     = false;
+
+    // ── Helpers ──
+    function getByType(type) {
+      return rotationData.filter(r => r.type === type);
+    }
+
+    function getUpNextFor(type) {
+      return getByType(type).find(r => !r.completed) || null;
+    }
+
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    // ── Load ──
+    async function loadRotations() {
+      try {
+        const res = await fetch('/api/rotations');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        rotationData = data.rotations;
+        renderRotationColumns();
+        if (isUnlocked) renderFacilitatorMgmt();
+        renderAgendaIfSelected();
+      } catch {
+        document.getElementById('rotation-columns').innerHTML =
+          '<p style="color:#e05454;font-size:0.9375rem;">could not load rotations — please refresh.</p>';
+      }
+    }
+
+    // ── Render public columns ──
+    function buildCol(type, colTitle) {
+      const entries = getByType(type);
+      if (entries.length === 0) {
+        return `<div>
+          <div class="rotation-col__title">${colTitle}</div>
+          <p class="rotation-empty">no one on the rotation yet.</p>
+        </div>`;
+      }
+      const upNextName = getUpNextFor(type)?.name;
+      const rows = entries.map((e, i) => {
+        const isNext = !e.completed && e.name === upNextName;
+        const isDone = e.completed;
+        let cls = 'rotation-entry';
+        if (isDone) cls += ' rotation-entry--completed';
+        else if (isNext) cls += ' rotation-entry--next';
+        const checkIcon = isDone ? '&#x2713;' : '&nbsp;';
+        const badge = isNext ? '<span class="next-badge">up next</span>' : '';
+        const date  = isDone && e.date ? `<span class="rotation-entry__date">${fmtDate(e.date)}</span>` : '';
+        return `<div class="${cls}">
+          <span class="rotation-entry__pos">${i + 1}.</span>
+          <span class="rotation-entry__check">${checkIcon}</span>
+          <span class="rotation-entry__name">${esc(e.name)}</span>
+          ${date}${badge}
+        </div>`;
+      }).join('');
+      return `<div>
+        <div class="rotation-col__title">${colTitle}</div>
+        ${rows}
+      </div>`;
+    }
+
+    function renderRotationColumns() {
+      document.getElementById('rotation-columns').innerHTML =
+        buildCol('concept-discussion', 'concept discussion') +
+        buildCol('demo-or-die', 'demo or die');
+    }
+
+    // ── Facilitator management UI ──
+    function renderFacilitatorMgmt() {
+      const container = document.getElementById('fac-mgmt');
+
+      function buildMgmtCol(type, colTitle) {
+        const entries = getByType(type);
+        if (entries.length === 0) {
+          return `<div>
+            <div class="rotation-mgmt-col__title">${colTitle}</div>
+            <p class="mgmt-empty">empty — add someone below</p>
+          </div>`;
+        }
+        const rows = entries.map((e, i) => {
+          const isDone = e.completed;
+          const canUp  = i > 0;
+          const canDn  = i < entries.length - 1;
+          const doneCtrl = isDone
+            ? `<span class="mgmt-done-label">&#x2713; done</span>`
+            : `<button class="mgmt-btn mgmt-btn--done"
+                data-action="complete"
+                data-name="${esc(e.name)}"
+                data-type="${type}">done</button>`;
+          return `<div class="mgmt-entry${isDone ? ' mgmt-entry--done' : ''}">
+            <span class="mgmt-entry__pos">${i + 1}.</span>
+            <span class="mgmt-entry__name" title="${esc(e.name)}">${esc(e.name)}</span>
+            ${doneCtrl}
+            <button class="mgmt-btn" data-action="swap-up"   data-type="${type}" data-index="${i}" ${canUp ? '' : 'disabled'}>&#x2191;</button>
+            <button class="mgmt-btn" data-action="swap-down" data-type="${type}" data-index="${i}" ${canDn ? '' : 'disabled'}>&#x2193;</button>
+            <button class="mgmt-btn mgmt-btn--remove" data-action="remove" data-name="${esc(e.name)}" data-type="${type}">&#x2715;</button>
+          </div>`;
+        }).join('');
+        return `<div>
+          <div class="rotation-mgmt-col__title">${colTitle}</div>
+          ${rows}
+        </div>`;
+      }
+
+      container.innerHTML = `
+        <form class="fac-add-form" id="add-form">
+          <input class="form-input" type="text" id="new-name" placeholder="member name" autocomplete="off">
+          <select class="form-select" id="new-type">
+            <option value="" disabled selected>rotation type</option>
+            <option value="concept-discussion">concept discussion</option>
+            <option value="demo-or-die">demo or die</option>
+          </select>
+          <button type="submit" class="btn btn--primary" style="padding:0.55rem 1rem;font-size:0.875rem;">add</button>
+        </form>
+        <div class="rotation-mgmt-cols" id="mgmt-cols">
+          ${buildMgmtCol('concept-discussion', 'concept discussion')}
+          ${buildMgmtCol('demo-or-die', 'demo or die')}
+        </div>`;
+
+      document.getElementById('add-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('new-name').value.trim();
+        const type = document.getElementById('new-type').value;
+        if (!name || !type) return;
+        await facAction({ action: 'add', name, type });
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-type').value = '';
+      });
+
+      document.getElementById('mgmt-cols').addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn || btn.hasAttribute('disabled')) return;
+        const { action, name, type } = btn.dataset;
+        const index = parseInt(btn.dataset.index, 10);
+        if (action === 'complete') {
+          await facAction({ action: 'complete', name, type });
+        } else if (action === 'swap-up') {
+          await facAction({ action: 'swap', type, indexA: index - 1, indexB: index });
+        } else if (action === 'swap-down') {
+          await facAction({ action: 'swap', type, indexA: index, indexB: index + 1 });
+        } else if (action === 'remove') {
+          if (!confirm(`Remove ${name} from the rotation?`)) return;
+          await facAction({ action: 'remove', name, type });
+        }
+      });
+    }
+
+    async function facAction(body) {
+      const errEl = document.getElementById('fac-error');
+      errEl.style.display = 'none';
+      try {
+        const res = await fetch('/api/rotations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ facilitatorPassword: facilitatorPw, ...body })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 403) {
+            // Wrong password — re-lock
+            isUnlocked = false;
+            facilitatorPw = null;
+            document.getElementById('fac-mgmt').style.display = 'none';
+            document.getElementById('fac-password').value = '';
+          }
+          errEl.textContent = data.error || 'something went wrong.';
+          errEl.style.display = 'block';
+          return;
+        }
+        rotationData = data.rotations;
+        renderRotationColumns();
+        renderFacilitatorMgmt();
+        renderAgendaIfSelected();
+      } catch {
+        errEl.textContent = 'something went wrong — please try again.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    // ── Unlock ──
+    document.getElementById('unlock-btn').addEventListener('click', () => {
+      const pw = document.getElementById('fac-password').value;
+      if (!pw) return;
+      facilitatorPw = pw;
+      isUnlocked = true;
+      document.getElementById('fac-mgmt').style.display = 'block';
+      renderFacilitatorMgmt();
+    });
+
+    document.getElementById('fac-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('unlock-btn').click();
+    });
+
+    // ── Agenda ──
+    const AGENDAS = {
+      'group-watch': {
+        title: 'group watch',
+        duration: '1 hr 25 min',
+        items: [
+          {
+            time: '0:00\u20130:10',
+            title: 'pre-processing reflection',
+            body: 'before we press play, everyone takes 5 minutes to write: what do I already think I know about this topic? what questions do I want this lesson to answer? brief share-out \u2014 30 seconds per person.'
+          },
+          {
+            time: '0:10\u20130:50',
+            title: 'watch together',
+            body: 'watch the lesson as a group. pause for questions or reactions. take notes in whatever format works \u2014 mind maps encouraged over linear notes.'
+          },
+          {
+            time: '0:50\u20131:15',
+            title: 'debrief discussion',
+            body: 'what landed? what confused you? what connects to work you already do? one person summarizes the lesson in 2 minutes in their own words. group adds, challenges, and asks questions.'
+          },
+          {
+            time: '1:15\u20131:25',
+            title: 'planning',
+            body: 'what does everyone do before next meeting? what exercises or practice go with this lesson? who is bringing something to show next week?'
+          }
+        ]
+      },
+      'discussion-shareout': {
+        title: 'discussion + shareout',
+        duration: '1 hr 5 min',
+        items: [
+          {
+            time: '0:00\u20130:10',
+            title: 'check-in',
+            body: 'not a status update \u2014 a temperature check. how is everyone feeling about the learning this week? confused? energized? behind? one or two sentences each.'
+          },
+          {
+            time: '0:10\u20130:35',
+            title: 'concept discussion',
+            body: "this week's lead: {conceptLead}. explain a concept from your week's material back to the group in your own words \u2014 not a presentation, just a conversation. group asks questions. gaps in the explanation reveal what everyone needs to revisit.",
+            slot: 'conceptLead'
+          },
+          {
+            time: '0:35\u20130:55',
+            title: 'demo or die',
+            body: 'this week: {demoLead}. show something you built or attempted. it does not have to work perfectly. show a notebook, a diagram, a concept map, a failed attempt. the only rule is: show your work, not a polished product.',
+            slot: 'demoLead'
+          },
+          {
+            time: '0:55\u20131:05',
+            title: 'planning',
+            body: "what is the focus for next week? who is leading concept discussion? who's doing demo or die? any blockers to flag?"
+          }
+        ]
+      }
+    };
+
+    function renderAgendaCard(type) {
+      const agenda = AGENDAS[type];
+      if (!agenda) return '';
+
+      const conceptName = getUpNextFor('concept-discussion')?.name || 'TBD';
+      const demoName    = getUpNextFor('demo-or-die')?.name    || 'TBD';
+
+      const items = agenda.items.map(item => {
+        let body = esc(item.body);
+        if (item.slot === 'conceptLead') {
+          body = body.replace('{conceptLead}', `<strong>${esc(conceptName)}</strong>`);
+        } else if (item.slot === 'demoLead') {
+          body = body.replace('{demoLead}', `<strong>${esc(demoName)}</strong>`);
+        }
+        return `<div class="agenda-item">
+          <div class="agenda-item__time">${esc(item.time)}</div>
+          <div>
+            <div class="agenda-item__title">${esc(item.title)}</div>
+            <div class="agenda-item__body">${body}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `<div class="agenda-card">
+        <div class="agenda-card__header">
+          <span class="agenda-card__title">${esc(agenda.title)}</span>
+          <span class="agenda-card__duration">${esc(agenda.duration)}</span>
+        </div>
+        ${items}
+      </div>`;
+    }
+
+    function renderAgendaIfSelected() {
+      const val = document.getElementById('agenda-type').value;
+      if (val) document.getElementById('agenda-container').innerHTML = renderAgendaCard(val);
+    }
+
+    document.getElementById('agenda-type').addEventListener('change', renderAgendaIfSelected);
+
+    // ── Init ──
+    loadRotations();
+  </script>
+  <script src="/js/nav.js"></script>
+
+</body>
+</html>

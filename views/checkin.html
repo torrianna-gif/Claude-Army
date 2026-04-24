@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — weekly check-in</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .checkin-intro {
+      padding: 2.5rem 0 0.5rem;
+    }
+
+    .checkin-intro__eyebrow {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+
+    .checkin-intro__title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .checkin-intro__subtitle {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 0.6rem 0;
+      margin-right: 2rem;
+      cursor: pointer;
+      text-transform: lowercase;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tab-btn:hover { color: var(--ink); }
+
+    .tab-btn.active {
+      color: var(--ink);
+      border-bottom-color: var(--coral);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Form ── */
+    .checkin-form {
+      max-width: 640px;
+      padding-bottom: 4rem;
+    }
+
+    .form-section {
+      margin-bottom: 1.75rem;
+    }
+
+    .form-label {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--bg);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23d4a843' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-select:focus { border-color: var(--coral); }
+
+    .form-textarea {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--bg);
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-textarea:focus { border-color: var(--coral); }
+
+    .feeling-input { max-width: 220px; }
+
+    /* ── Confirm banner ── */
+    .confirm-banner {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(123, 94, 167, 0.1);
+      border: 1.5px solid var(--teal);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 2rem;
+      font-size: 0.9375rem;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .confirm-banner.visible { display: flex; }
+
+    .confirm-banner__icon {
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    /* ── This week panel ── */
+    .week-panel {
+      max-width: 640px;
+      padding-bottom: 4rem;
+    }
+
+    .week-panel__meta {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Check-in cards ── */
+    .checkin-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .checkin-card__header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .checkin-card__name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--ink);
+      text-transform: lowercase;
+    }
+
+    .checkin-card__feeling {
+      display: inline-block;
+      background: rgba(123, 94, 167, 0.15);
+      color: var(--teal);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      text-transform: lowercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .checkin-card__stage {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--teal);
+      margin-bottom: 1rem;
+    }
+
+    .checkin-card__fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .checkin-card__field-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .checkin-card__field-text {
+      font-size: 0.9375rem;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .checkin-card__field-empty {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .checkin-card__timestamp {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    /* ── House badges ── */
+    .checkin-card__name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .house-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+    .house-badge--lovelace { background: rgba(201, 72, 88, 0.15);  color: #e8808a; }
+    .house-badge--turing   { background: rgba(75, 125, 191, 0.15); color: #80aae0; }
+    .house-badge--hopper   { background: rgba(58, 168, 118, 0.15); color: #70c898; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-state__emoji {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-state__text {
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* ── Loading state ── */
+    .loading-state {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      padding: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/dashboard" class="site-header__logo">claude's <span>army</span></a>
+        <nav class="site-header__nav">
+          <div class="nav-links">
+            <a href="/checkin">check-in</a>
+            <a href="/feynman">feynman</a>
+            <a href="/digest">digest</a>
+            <a href="/houses">houses</a>
+            <a href="/meetings">meetings</a>
+            <a href="/demos">demos</a>
+            <a href="/map">map</a>
+          </div>
+          <form method="POST" action="/logout" style="margin:0">
+            <button type="submit" class="btn btn--ghost" style="padding:0.4rem 1rem;font-size:0.8125rem;">log out</button>
+          </form>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="checkin-intro">
+        <p class="checkin-intro__eyebrow">Stage 1 — Foundations</p>
+        <h1 class="checkin-intro__title">weekly check-in</h1>
+        <p class="checkin-intro__subtitle">a few minutes of reflection goes a long way. no pressure to have it all figured out.</p>
+      </div>
+
+      <hr class="divider">
+
+      <div class="tab-bar" role="tablist">
+        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-submit" id="tab-submit">
+          log this week
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-week" id="tab-week">
+          this week
+        </button>
+      </div>
+
+      <!-- Submit tab -->
+      <div class="tab-panel active" id="panel-submit" role="tabpanel" aria-labelledby="tab-submit">
+
+        <div class="confirm-banner" id="confirm-banner" role="alert">
+          <span class="confirm-banner__icon">&#x1F44A;</span>
+          <span>your check-in is in. the cohort sees you. &#x1F44A;</span>
+        </div>
+
+        <form class="checkin-form" id="checkin-form" novalidate>
+
+          <div class="form-section">
+            <label class="form-label" for="name">your name</label>
+            <input
+              class="form-input"
+              type="text"
+              id="name"
+              name="name"
+              placeholder="first name is fine"
+              required
+              autocomplete="given-name"
+            >
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="house">your house</label>
+            <select class="form-select" id="house" name="house">
+              <option value="" disabled selected>select your house</option>
+              <option value="lovelace">House Lovelace — The Builders</option>
+              <option value="turing">House Turing — The Puzzle-Solvers</option>
+              <option value="hopper">House Hopper — The Translators</option>
+            </select>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="stageWeek">current stage / week</label>
+            <select class="form-select" id="stageWeek" name="stageWeek" required>
+              <option value="" disabled selected>select your week</option>
+              <option>Stage 1 Week 1</option>
+              <option>Stage 1 Week 2</option>
+              <option>Stage 1 Week 3</option>
+              <option>Stage 1 Week 4</option>
+              <option>Stage 2 Week 1</option>
+              <option>Stage 2 Week 2</option>
+              <option>Stage 2 Week 3</option>
+              <option>Stage 2 Week 4</option>
+              <option>Stage 3</option>
+              <option>Stage 4</option>
+              <option>Stage 5</option>
+            </select>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="completed">what did you complete this week?</label>
+            <textarea
+              class="form-textarea"
+              id="completed"
+              name="completed"
+              placeholder="lessons, exercises, experiments, conversations..."
+            ></textarea>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="confused">what confused you or didn't click?</label>
+            <textarea
+              class="form-textarea"
+              id="confused"
+              name="confused"
+              placeholder="be honest — confusion is data, not failure"
+            ></textarea>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="carryingForward">what question are you carrying into next week?</label>
+            <textarea
+              class="form-textarea"
+              id="carryingForward"
+              name="carryingForward"
+              placeholder="the thing you're still turning over..."
+            ></textarea>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="feeling">one word for how you're feeling right now</label>
+            <input
+              class="form-input feeling-input"
+              type="text"
+              id="feeling"
+              name="feeling"
+              placeholder="e.g. curious, tired, good"
+              maxlength="30"
+            >
+          </div>
+
+          <p class="form-error" id="form-error" style="display:none; margin-bottom: 1rem;"></p>
+
+          <button type="submit" class="btn btn--primary" id="submit-btn">
+            share with the cohort
+          </button>
+
+        </form>
+      </div>
+
+      <!-- This week tab -->
+      <div class="tab-panel" id="panel-week" role="tabpanel" aria-labelledby="tab-week">
+        <div class="week-panel">
+          <p class="week-panel__meta" id="week-meta"></p>
+          <div id="checkins-list">
+            <p class="loading-state">loading...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ── Tab switching ──
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        const panel = document.getElementById(tab.getAttribute('aria-controls'));
+        panel.classList.add('active');
+        if (tab.id === 'tab-week') loadCheckins();
+      });
+    });
+
+    // ── Form submission ──
+    const form = document.getElementById('checkin-form');
+    const banner = document.getElementById('confirm-banner');
+    const submitBtn = document.getElementById('submit-btn');
+    const formError = document.getElementById('form-error');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      formError.style.display = 'none';
+
+      const data = {
+        name:            form.name.value.trim(),
+        house:           form.house.value,
+        stageWeek:       form.stageWeek.value,
+        completed:       form.completed.value.trim(),
+        confused:        form.confused.value.trim(),
+        carryingForward: form.carryingForward.value.trim(),
+        feeling:         form.feeling.value.trim()
+      };
+
+      if (!data.name || !data.stageWeek) {
+        formError.textContent = 'name and stage/week are required.';
+        formError.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'sending...';
+
+      try {
+        const res = await fetch('/api/checkins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('server error');
+        form.reset();
+        banner.classList.add('visible');
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch {
+        formError.textContent = 'something went wrong — please try again.';
+        formError.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'share with the cohort';
+      }
+    });
+
+    form.addEventListener('input', () => {
+      banner.classList.remove('visible');
+    }, { once: true });
+
+    // ── This week view ──
+    function timeAgo(iso) {
+      const diff = Date.now() - new Date(iso).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return `${mins} minute${mins === 1 ? '' : 's'} ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `${hrs} hour${hrs === 1 ? '' : 's'} ago`;
+      const days = Math.floor(hrs / 24);
+      return `${days} day${days === 1 ? '' : 's'} ago`;
+    }
+
+    function escape(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function renderField(label, value) {
+      if (!value) {
+        return `<div>
+          <div class="checkin-card__field-label">${label}</div>
+          <div class="checkin-card__field-empty">nothing shared</div>
+        </div>`;
+      }
+      return `<div>
+        <div class="checkin-card__field-label">${label}</div>
+        <div class="checkin-card__field-text">${escape(value)}</div>
+      </div>`;
+    }
+
+    const HOUSE_BADGE_CLASS = { lovelace: 'house-badge--lovelace', turing: 'house-badge--turing', hopper: 'house-badge--hopper' };
+
+    function renderCard(c) {
+      const feelingBadge = c.feeling
+        ? `<span class="checkin-card__feeling">${escape(c.feeling)}</span>`
+        : '';
+      const houseBadge = c.house && HOUSE_BADGE_CLASS[c.house]
+        ? `<span class="house-badge ${HOUSE_BADGE_CLASS[c.house]}">${escape(c.house)}</span>`
+        : '';
+      return `
+        <div class="checkin-card">
+          <div class="checkin-card__header">
+            <div class="checkin-card__name-row">
+              <div class="checkin-card__name">${escape(c.name)}</div>
+              ${houseBadge}
+            </div>
+            ${feelingBadge}
+          </div>
+          <div class="checkin-card__stage">${escape(c.stageWeek)}</div>
+          <div class="checkin-card__fields">
+            ${renderField('completed', c.completed)}
+            ${renderField('confused by', c.confused)}
+            ${renderField('carrying forward', c.carryingForward)}
+          </div>
+          <div class="checkin-card__timestamp">${timeAgo(c.timestamp)}</div>
+        </div>`;
+    }
+
+    async function loadCheckins() {
+      const list = document.getElementById('checkins-list');
+      const meta = document.getElementById('week-meta');
+      list.innerHTML = '<p class="loading-state">loading...</p>';
+      try {
+        const res = await fetch('/api/checkins');
+        if (!res.ok) throw new Error();
+        const { checkins } = await res.json();
+        if (checkins.length === 0) {
+          meta.textContent = '';
+          list.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state__emoji">&#x1F4AC;</div>
+              <p class="empty-state__text">no check-ins yet this week. be the first!</p>
+            </div>`;
+        } else {
+          meta.textContent = `${checkins.length} check-in${checkins.length === 1 ? '' : 's'} this week`;
+          list.innerHTML = checkins.map(renderCard).join('');
+        }
+      } catch {
+        list.innerHTML = '<p class="form-error">could not load check-ins — please try again.</p>';
+      }
+    }
+  </script>
+  <script src="/js/nav.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — weekly digest</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .digest-intro {
+      padding: 2.5rem 0 0.5rem;
+    }
+
+    .digest-intro__eyebrow {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+
+    .digest-intro__title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .digest-intro__subtitle {
+      color: var(--muted);
+      font-size: 0.9375rem;
+    }
+
+    /* ── Generate section ── */
+    .generate-section {
+      max-width: 640px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .generate-section__eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--coral);
+      margin-bottom: 0.35rem;
+    }
+
+    .generate-section__title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .generate-section__desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 1.1rem;
+    }
+
+    /* ── States ── */
+    .generate-state { display: none; }
+    .generate-state.visible { display: block; }
+
+    .generate-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .confirm-message {
+      font-size: 0.9375rem;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .confirm-message strong {
+      color: var(--coral);
+    }
+
+    .confirm-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Loading ── */
+    .loading-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+      padding: 0.25rem 0;
+    }
+
+    .loading-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--coral);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+
+    .generate-error {
+      font-size: 0.875rem;
+      color: #e05454;
+      padding: 0.25rem 0;
+    }
+
+    /* ── Digests list ── */
+    .digests-section {
+      max-width: 640px;
+      padding-bottom: 4rem;
+    }
+
+    .digests-section__meta {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Digest card ── */
+    .digest-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .digest-card__header {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .digest-card__week {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.2rem;
+    }
+
+    .digest-card__generated {
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+
+    .digest-card__content h3 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--coral);
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .digest-card__content h3:first-child { margin-top: 0; }
+
+    .digest-card__content p {
+      font-size: 0.9375rem;
+      color: var(--ink);
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+
+    .digest-card__content p:last-child { margin-bottom: 0; }
+
+    .digest-card__content strong { font-weight: 600; }
+    .digest-card__content em { font-style: italic; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-state__emoji {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-state__text {
+      font-size: 1rem;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/dashboard" class="site-header__logo">claude's <span>army</span></a>
+        <nav class="site-header__nav">
+          <div class="nav-links">
+            <a href="/checkin">check-in</a>
+            <a href="/feynman">feynman</a>
+            <a href="/digest">digest</a>
+            <a href="/houses">houses</a>
+            <a href="/meetings">meetings</a>
+            <a href="/demos">demos</a>
+            <a href="/map">map</a>
+          </div>
+          <form method="POST" action="/logout" style="margin:0">
+            <button type="submit" class="btn btn--ghost" style="padding:0.4rem 1rem;font-size:0.8125rem;">log out</button>
+          </form>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="digest-intro">
+        <p class="digest-intro__eyebrow">weekly digest</p>
+        <h1 class="digest-intro__title">the cohort's week in review</h1>
+        <p class="digest-intro__subtitle">every week, a snapshot of what the cohort explored — the themes, the sticking points, and the questions worth carrying forward.</p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Generate section -->
+      <div class="generate-section">
+        <p class="generate-section__eyebrow">this week</p>
+        <p class="generate-section__title">generate this week's digest</p>
+        <p class="generate-section__desc">pulls all check-ins from the last 7 days and asks the ai to find the themes.</p>
+
+        <!-- State: initial -->
+        <div class="generate-state visible" id="state-initial">
+          <div class="generate-row">
+            <button class="btn btn--primary" id="generate-btn" type="button">generate this week's digest</button>
+          </div>
+        </div>
+
+        <!-- State: confirm -->
+        <div class="generate-state" id="state-confirm">
+          <p class="confirm-message" id="confirm-message"></p>
+          <div class="confirm-row">
+            <button class="btn btn--primary" id="confirm-btn" type="button">yes, generate</button>
+            <button class="btn btn--ghost" id="cancel-btn" type="button">cancel</button>
+          </div>
+        </div>
+
+        <!-- State: loading -->
+        <div class="generate-state" id="state-loading">
+          <div class="loading-row">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <span>generating — this takes a moment...</span>
+          </div>
+        </div>
+
+        <!-- State: no check-ins -->
+        <div class="generate-state" id="state-no-checkins">
+          <p style="font-size:0.9375rem;color:var(--muted);margin:0;">no check-ins to summarize yet — come back after people have checked in this week.</p>
+          <div style="margin-top:0.85rem;">
+            <button class="btn btn--ghost" id="no-checkins-back-btn" type="button" style="font-size:0.8125rem;">got it</button>
+          </div>
+        </div>
+
+        <!-- State: error -->
+        <div class="generate-state" id="state-error">
+          <p class="generate-error" id="error-message"></p>
+          <div style="margin-top:0.75rem;">
+            <button class="btn btn--ghost" id="error-back-btn" type="button" style="font-size:0.8125rem;">try again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past digests -->
+      <div class="digests-section">
+        <p class="digests-section__meta" id="digests-meta"></p>
+        <div id="digests-list">
+          <p style="color:var(--muted);font-size:0.9375rem;">loading...</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ── Markdown renderer ──
+    function renderMarkdown(raw) {
+      const escaped = raw
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      return escaped.split(/\n\n+/).map(block => {
+        const trimmed = block.trim();
+        if (!trimmed) return '';
+
+        // Handle ## and ### headings
+        const h3Match = trimmed.match(/^###\s+(.+)$/);
+        if (h3Match) return `<h3>${h3Match[1]}</h3>`;
+
+        const h2Match = trimmed.match(/^##\s+(.+)$/);
+        if (h2Match) return `<h3>${h2Match[1]}</h3>`;
+
+        // Handle **bold-only line** as a heading
+        const boldHeaderMatch = trimmed.match(/^\*\*(.*?)\*\*$/);
+        if (boldHeaderMatch) return `<h3>${boldHeaderMatch[1]}</h3>`;
+
+        const html = trimmed
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*((?!\s).*?(?<!\s))\*/g, '<em>$1</em>')
+          .replace(/\n/g, '<br>');
+
+        return `<p>${html}</p>`;
+      }).filter(Boolean).join('\n');
+    }
+
+    // ── Date formatting ──
+    function formatGenerated(iso) {
+      return new Date(iso).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    }
+
+    // ── Render digest card ──
+    function renderDigestCard(d) {
+      return `
+        <div class="digest-card">
+          <div class="digest-card__header">
+            <div class="digest-card__week">week of ${d.weekOf}</div>
+            <div class="digest-card__generated">generated ${formatGenerated(d.generatedAt)}</div>
+          </div>
+          <div class="digest-card__content">
+            ${renderMarkdown(d.content)}
+          </div>
+        </div>`;
+    }
+
+    // ── Render full list ──
+    function renderList(digestArr) {
+      const meta = document.getElementById('digests-meta');
+      const list = document.getElementById('digests-list');
+
+      if (digestArr.length === 0) {
+        meta.textContent = '';
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__emoji">&#x1F4C4;</div>
+            <p class="empty-state__text">no digests yet. check back after someone generates one!</p>
+          </div>`;
+      } else {
+        meta.textContent = `${digestArr.length} digest${digestArr.length === 1 ? '' : 's'}`;
+        list.innerHTML = digestArr.map(renderDigestCard).join('');
+      }
+    }
+
+    // ── Load digests ──
+    async function loadDigests() {
+      try {
+        const res = await fetch('/api/digests');
+        if (!res.ok) throw new Error();
+        const { digests } = await res.json();
+        renderList(digests);
+      } catch {
+        document.getElementById('digests-list').innerHTML =
+          '<p style="color:#e05454;font-size:0.9375rem;">could not load digests — please refresh.</p>';
+      }
+    }
+
+    // ── State machine ──
+    const states = ['initial', 'confirm', 'loading', 'no-checkins', 'error'];
+
+    function setState(name) {
+      states.forEach(s => {
+        document.getElementById(`state-${s}`).classList.toggle('visible', s === name);
+      });
+    }
+
+    // ── Generate flow ──
+    document.getElementById('generate-btn').addEventListener('click', async () => {
+      setState('loading');
+      try {
+        const res = await fetch('/api/checkins/count');
+        if (!res.ok) throw new Error();
+        const { count } = await res.json();
+
+        if (count === 0) {
+          setState('no-checkins');
+          return;
+        }
+
+        document.getElementById('confirm-message').innerHTML =
+          `ready to summarize <strong>${count} check-in${count === 1 ? '' : 's'}</strong> from this week. this will create a new digest visible to the whole cohort.`;
+        setState('confirm');
+      } catch {
+        document.getElementById('error-message').textContent =
+          'could not load check-in count — please try again.';
+        setState('error');
+      }
+    });
+
+    document.getElementById('confirm-btn').addEventListener('click', async () => {
+      setState('loading');
+      try {
+        const res = await fetch('/api/digest/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (res.status === 400 && data.error && data.error.includes('no check-ins')) {
+            setState('no-checkins');
+          } else {
+            document.getElementById('error-message').textContent =
+              data.error || 'something went wrong — please try again.';
+            setState('error');
+          }
+          return;
+        }
+
+        setState('initial');
+        await loadDigests();
+        document.getElementById('digests-list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch {
+        document.getElementById('error-message').textContent =
+          'something went wrong — try again in a moment.';
+        setState('error');
+      }
+    });
+
+    document.getElementById('cancel-btn').addEventListener('click', () => setState('initial'));
+    document.getElementById('no-checkins-back-btn').addEventListener('click', () => setState('initial'));
+    document.getElementById('error-back-btn').addEventListener('click', () => setState('initial'));
+
+    // Load on page init
+    loadDigests();
+  </script>
+  <script src="/js/nav.js"></script>
+
+</body>
+</html>

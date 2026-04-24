@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — houses</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .houses-intro {
+      padding: 2.5rem 0 0.5rem;
+    }
+
+    .houses-intro__eyebrow {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+
+    .houses-intro__title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .houses-intro__subtitle {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      max-width: 520px;
+    }
+
+    /* ── Houses grid ── */
+    .houses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 4rem;
+    }
+
+    .house-card {
+      display: block;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .house-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .house-card__bar {
+      height: 5px;
+      background: var(--house);
+    }
+
+    .house-card__body {
+      padding: 1.75rem;
+    }
+
+    .house-card__archetype {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--house);
+      margin-bottom: 0.3rem;
+    }
+
+    .house-card__name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-transform: lowercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .house-card__motto {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+    }
+
+    .house-card__cta {
+      display: inline-block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--house);
+    }
+
+    /* House accent colors */
+    .house-card--lovelace { --house: #c94858; }
+    .house-card--turing   { --house: #4b7dbf; }
+    .house-card--hopper   { --house: #3aa876; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/dashboard" class="site-header__logo">claude's <span>army</span></a>
+        <nav class="site-header__nav">
+          <div class="nav-links">
+            <a href="/checkin">check-in</a>
+            <a href="/feynman">feynman</a>
+            <a href="/digest">digest</a>
+            <a href="/houses">houses</a>
+            <a href="/meetings">meetings</a>
+            <a href="/demos">demos</a>
+            <a href="/map">map</a>
+          </div>
+          <form method="POST" action="/logout" style="margin:0">
+            <button type="submit" class="btn btn--ghost" style="padding:0.4rem 1rem;font-size:0.8125rem;">log out</button>
+          </form>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="houses-intro">
+        <p class="houses-intro__eyebrow">houses</p>
+        <h1 class="houses-intro__title">find your people</h1>
+        <p class="houses-intro__subtitle">the cohort is organized into three houses. mid-week, check in with yours — smaller group, more specific, more honest.</p>
+      </div>
+
+      <hr class="divider">
+
+      <div class="houses-grid">
+
+        <a href="/houses/lovelace" class="house-card house-card--lovelace">
+          <div class="house-card__bar"></div>
+          <div class="house-card__body">
+            <p class="house-card__archetype">The Builders</p>
+            <h2 class="house-card__name">House Lovelace</h2>
+            <p class="house-card__motto">"The bug is the lesson."</p>
+            <span class="house-card__cta">enter house &rarr;</span>
+          </div>
+        </a>
+
+        <a href="/houses/turing" class="house-card house-card--turing">
+          <div class="house-card__bar"></div>
+          <div class="house-card__body">
+            <p class="house-card__archetype">The Puzzle-Solvers</p>
+            <h2 class="house-card__name">House Turing</h2>
+            <p class="house-card__motto">"What question are we actually asking?"</p>
+            <span class="house-card__cta">enter house &rarr;</span>
+          </div>
+        </a>
+
+        <a href="/houses/hopper" class="house-card house-card--hopper">
+          <div class="house-card__bar"></div>
+          <div class="house-card__body">
+            <p class="house-card__archetype">The Translators</p>
+            <h2 class="house-card__name">House Hopper</h2>
+            <p class="house-card__motto">"The most dangerous phrase is 'we've always done it this way.'"</p>
+            <span class="house-card__cta">enter house &rarr;</span>
+          </div>
+        </a>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/js/nav.js"></script>
+
+</body>
+</html>

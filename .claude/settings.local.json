@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pkill -f \"node server.js\")",
+      "Bash(COHORT_PASSWORD=test node server.js)",
+      "Bash(curl -s -i -X POST -d 'password=test' -c /tmp/ca-cookies.txt http://localhost:3000/login)",
+      "Bash(curl -s -b /tmp/ca-cookies.txt -X POST http://localhost:3000/api/checkins -H 'Content-Type: application/json' -d '{\"name\":\"Alex\",\"stageWeek\":\"Stage 1 Week 1\",\"completed\":\"intro module\",\"confused\":\"context windows\",\"carryingForward\":\"how does RAG work?\",\"feeling\":\"curious\"}')",
+      "Bash(curl -s -b /tmp/ca-cookies.txt -X POST http://localhost:3000/api/checkins -H 'Content-Type: application/json' -d '{\"name\":\"\",\"stageWeek\":\"\"}')",
+      "Bash(git add *)"
+    ]
+  }
+}

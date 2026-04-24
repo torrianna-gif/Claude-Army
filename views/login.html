@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — enter</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .lock-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-card__header">
+        <span class="lock-icon">&#x1F512;</span>
+        <div class="auth-card__wordmark">claude's <span>army</span></div>
+        <p class="auth-card__prompt">enter the cohort password</p>
+      </div>
+
+      <div class="card">
+        <form method="POST" action="/login" id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="password">password</label>
+            <input
+              class="form-input"
+              type="password"
+              id="password"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              autofocus
+            >
+            <p class="form-error" id="error-msg" style="display:none;">
+              that's not it — try again.
+            </p>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full">enter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Show error if redirected with ?error=1
+    if (new URLSearchParams(window.location.search).get('error') === '1') {
+      const input = document.getElementById('password');
+      const msg = document.getElementById('error-msg');
+      input.classList.add('form-input--error');
+      msg.style.display = 'block';
+      // Clear the ?error from the URL without a reload
+      history.replaceState(null, '', '/login');
+    }
+  </script>
+</body>
+</html>

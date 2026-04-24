@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>claude's army — dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/dashboard" class="site-header__logo">claude's <span>army</span></a>
+        <nav class="site-header__nav">
+          <div class="nav-links">
+            <a href="/checkin">check-in</a>
+            <a href="/feynman">feynman</a>
+            <a href="/digest">digest</a>
+            <a href="/houses">houses</a>
+            <a href="/meetings">meetings</a>
+            <a href="/demos">demos</a>
+            <a href="/map">map</a>
+          </div>
+          <form method="POST" action="/logout" style="margin:0">
+            <button type="submit" class="btn btn--ghost" style="padding:0.4rem 1rem;font-size:0.8125rem;">log out</button>
+          </form>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="page-hero">
+        <p class="page-hero__eyebrow">Stage 1 — Foundations</p>
+        <h1 class="page-hero__title">claude's army</h1>
+        <p class="page-hero__subtitle" id="dashboard-subtitle">welcome back. let's keep going.</p>
+      </section>
+
+      <hr class="divider">
+
+      <section style="margin-bottom: 1.5rem;">
+
+        <div class="nav-group">
+          <p class="nav-group__label">learning</p>
+          <div class="nav-grid nav-grid--3">
+
+            <a href="/checkin" class="card card--link">
+              <span class="card__icon">&#x270F;&#xFE0F;</span>
+              <div class="card__title">weekly check-in</div>
+              <p class="card__desc">log how you're feeling, what you learned, and any questions that came up this week.</p>
+              <span class="card__arrow">open &rarr;</span>
+            </a>
+
+            <a href="/feynman" class="card card--link">
+              <span class="card__icon">&#x1F4A1;</span>
+              <div class="card__title">feynman corner</div>
+              <p class="card__desc">explain a concept in your own words. teaching it is the fastest way to own it.</p>
+              <span class="card__arrow">open &rarr;</span>
+            </a>
+
+            <a href="/demos" class="card card--link">
+              <span class="card__icon">&#x1F4BB;</span>
+              <div class="card__title">demo or die</div>
+              <p class="card__desc">show your rough work to the cohort. low bar, high frequency — post before it's ready.</p>
+              <span class="card__arrow">open &rarr;</span>
+            </a>
+
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <p class="nav-group__label">community</p>
+          <div class="nav-grid nav-grid--4">
+
+            <a href="/houses" class="card card--link">
+              <span class="card__icon">&#x1F3E0;</span>
+              <div class="card__title">houses</div>
+              <p class="card__desc">check in with your house mid-week. small group, real talk, concrete commitments.</p>
+              <span class="card__arrow">open &rarr;</span>
+            </a>
+
+            <a href="/digest" class="card card--link">
+              <span class="card__icon">&#x1F4F0;</span>
+              <div class="card__title">cohort digest</div>
+              <p class="card__desc">a curated summary of what the cohort explored, discovered, and got stuck on this week.</p>
+              <span class="card__arrow">open &rarr;</span>
+            </a>
+
+            <a href="/meetings" class="card card--link">
+              <span class="card__icon">&#x1F5D3;&#xFE0F;</span>
+              <div class="card__title">meetings</div>
+              <p class="card__desc">agendas, rotations, and who's up next. so anyone can run the meeting.</p>
+              <span class="card__arrow">open &rarr;</span>
+            </a>
+
+            <a href="/map" class="card card--link">
+              <span class="card__icon">&#x1F5FA;&#xFE0F;</span>
+              <div class="card__title">cohort map</div>
+              <p class="card__desc">see where everyone is in the program. mark your position and follow the cohort's journey.</p>
+              <span class="card__arrow">open &rarr;</span>
+            </a>
+
+          </div>
+        </div>
+
+      </section>
+
+      <hr class="divider">
+
+      <div class="quote-block" style="margin-top: 2rem;">
+        <p class="quote-block__text" id="rotating-quote"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (async function updateSubtitle() {
+      try {
+        const res = await fetch('/api/map');
+        if (!res.ok) return;
+        const { entries } = await res.json();
+        if (!entries || entries.length === 0) return;
+        const counts = {};
+        entries.forEach(e => { counts[e.stage] = (counts[e.stage] || 0) + 1; });
+        const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+        const labels = {
+          stage1: 'stage 1 — foundations',
+          stage2: 'stage 2 — ai & ml fundamentals',
+          stage3: 'stage 3 — rags, agents & applied ai',
+          stage4: 'stage 4 — governance & policy',
+          stage5: 'stage 5 — applied projects',
+        };
+        if (labels[top]) {
+          document.getElementById('dashboard-subtitle').textContent =
+            `most of the cohort is in ${labels[top]}.`;
+        }
+      } catch {}
+    })();
+  </script>
+  <script src="/js/quotes.js"></script>
+  <script src="/js/nav.js"></script>
+</body>
+</html>
